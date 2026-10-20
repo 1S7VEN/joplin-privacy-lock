@@ -143,7 +143,7 @@ sealed class LockContext : ApplicationContext {
     void ShowDialog(bool setup) {
         if(dialog!=null&&!dialog.IsDisposed) {if(!setup&&configuring){dialog.Dispose();dialog=null;}else {if(dialog.WindowState==FormWindowState.Minimized)dialog.WindowState=FormWindowState.Normal;Native.ShowWindow(dialog.Handle,9);dialog.Activate();return;}}
         configuring=setup;
-        var form=new Form {Text=setup?"设置 Joplin 锁定密码":"Joplin 已锁定",ClientSize=new Size(430,setup?420:250),StartPosition=FormStartPosition.CenterScreen,FormBorderStyle=FormBorderStyle.FixedDialog,MaximizeBox=false,MinimizeBox=!setup,ControlBox=setup,TopMost=true,Font=new Font("Microsoft YaHei UI",10),BackColor=Color.FromArgb(245,248,252)};
+        var form=new Form {Text=setup?"设置 Joplin 锁定密码":"Joplin 已锁定",ClientSize=new Size(430,setup?420:250),StartPosition=FormStartPosition.CenterScreen,FormBorderStyle=FormBorderStyle.FixedDialog,MaximizeBox=false,MinimizeBox=!setup,ControlBox=true,TopMost=true,Font=new Font("Microsoft YaHei UI",10),BackColor=Color.FromArgb(245,248,252)};
         dialog=form;
         var title=new Label {Text=setup?"设置或修改锁定密码":"输入密码以继续查看笔记",Left=25,Top=20,Width=380,Height=30,Font=new Font("Microsoft YaHei UI",13,FontStyle.Bold)};form.Controls.Add(title);
         int top=65;
@@ -167,6 +167,15 @@ sealed class LockContext : ApplicationContext {
                 failures=0;retryAt=DateTime.MinValue;
             }catch(Exception err){message.Text=err.Message;Log(err);}
             finally{busy=false;if(!submit.IsDisposed)submit.Enabled=true;}
+        };
+        // Closing the password prompt only dismisses it; authentication is still required.
+        form.FormClosing+=(sender,args)=>{
+            if(!setup&&locked&&args.CloseReason==CloseReason.UserClosing) {
+                args.Cancel=true;
+                if(current!=null)current.Clear();
+                message.Text="";
+                form.Hide();
+            }
         };
         form.FormClosed+=(sender,args)=>{if(dialog==form)dialog=null;};
         form.Shown+=(sender,args)=>{if(current!=null)current.Focus();else next.Focus();};
