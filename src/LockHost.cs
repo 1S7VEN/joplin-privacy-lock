@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,6 +18,7 @@ static class Native {
     [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
     [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr h);
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int n);
+    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
     [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint p);
     [DllImport("user32.dll")] public static extern IntPtr GetWindow(IntPtr h, uint n);
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern int GetWindowText(IntPtr h, StringBuilder t, int n);
@@ -130,7 +131,12 @@ sealed class LockContext : ApplicationContext {
     void Unlock() {
         locked=false;graceUntil=DateTime.UtcNow.AddSeconds(3);
         if(dialog!=null){dialog.Dispose();dialog=null;}
-        foreach(var h in hidden.ToArray())if(Native.IsWindow(h))Native.ShowWindow(h,9);
+        // Restore minimized and tray windows after successful authentication.
+        Scan();
+        foreach(var h in tracked.Concat(hidden).Distinct().ToArray())if(Native.IsWindow(h)) {
+            Native.ShowWindow(h,9);
+            Native.SetForegroundWindow(h);
+        }
         hidden.Clear();
         policy.Reset(Observe());
     }
