@@ -1,2 +1,49 @@
-# joplin-privacy-lock
-隐私与锁定：Windows 版 Joplin 应用锁，支持最小化、托盘、闲置时间和密码解锁。
+# 隐私与锁定 · Joplin Privacy Lock
+
+Windows 桌面版 Joplin 的本地应用锁插件。当前版本 **0.2.2**，适配目标 **Joplin 3.7.21**。
+
+## 下载安装
+
+[下载最新版插件 .jpl](releases/local.joplin.minimize-lock.jpl?raw=true)
+
+在 Joplin 打开 **工具 → 选项 → 插件 → 齿轮 → 从文件安装插件**，选择下载的 `.jpl`。完全退出 Joplin，等待约 5 秒再打开。首次启动自行设置至少 4 位的解锁密码，已有密码在升级时保留。请停用其他锁屏插件，避免重复锁定。
+
+## 功能
+
+- 最小化锁定开关、独立延迟秒数（默认开启、0 秒）。
+- 隐藏到托盘锁定开关、独立延迟秒数（默认开启、0 秒）。
+- 电脑闲置锁定分钟数（默认 5 分钟，0 为关闭）。
+- 未达到延迟时间就恢复窗口，会取消此次倒计时。
+- 启动时自动进入锁定状态。锁定时不抢先弹出密码窗口，再次打开或恢复 Joplin 时才显示解锁窗口。
+- 工具菜单和锁头按钮可手动锁定、设置或修改密码；快捷键 `Ctrl+Alt+L`。
+- 连续输错 5 次需等待 15 秒；密码可用四位数字。
+
+在 **工具 → 选项 → 隐私与锁定** 修改设置，保存后生效。辅助程序约每 0.2 秒检查窗口状态。
+
+## 隐私与限制
+
+本插件不联网，不读取、上传或修改笔记正文。解锁密码由用户自行在本机输入；PBKDF2 加盐校验值由 Windows 当前账户 DPAPI 保护，不保存明文密码。仓库不包含用户笔记、密码记录或本机配置。
+
+这是界面锁，**不加密本地笔记数据库或附件**，也不能防止有本机文件访问权限的人卸载插件。请配合 Windows 登录密码和磁盘加密使用。密码窗口可最小化，但不能通过关闭它解除锁定。
+
+本插件使用 Windows 本地辅助程序，因此仅支持 Windows。未发布到 Joplin 插件商店。不同版本 Joplin 或系统环境仍需自行测试最小化、托盘和解锁流程。
+
+## 退出与恢复
+
+先完全退出 Joplin。插件辅助进程会在 Joplin 窗口关闭后约 5 秒退出。若忘记密码，可在应用退出后停用插件，或将配置目录 `plugins/local.joplin.minimize-lock.jpl` 移走；如仍有同插件的 `LockHost.exe` 进程，再结束该进程。不要删除笔记数据库。
+
+标准 Windows 配置目录通常为 `%USERPROFILE%\.config\joplin-desktop`，便携版和自定义配置可能不同。密码记录在插件自己的 `plugin-data/local.joplin.minimize-lock/credential.dat` 中。重装同 ID 的插件不会自动清除旧密码。
+
+## 从源码构建
+
+需要 Windows、Node.js、Python 3 和 .NET Framework 4.x 编译器。安装开发依赖后运行：
+
+```powershell
+npm ci
+npm test
+npm run build
+npm run test:native
+```
+
+生成文件位于 `releases/local.joplin.minimize-lock.jpl`。测试使用独立临时目录和虚构密码，不访问实际笔记。锁定策略测试覆盖独立开关、延迟边界、恢复取消、托盘切换、闲置关闭和解锁后的再次触发。
+

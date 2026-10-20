@@ -1,0 +1,14 @@
+{
+  "name": "joplin-privacy-lock",
+  "version": "0.2.2",
+  "private": true,
+  "description": "Privacy and Lock for Joplin on Windows",
+  "scripts": {
+    "build": "node build.cjs",
+    "test": "node --test tests/native-entry.test.js",
+    "test:native": "node test-native.cjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

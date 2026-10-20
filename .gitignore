@@ -1,0 +1,9 @@
+node_modules/
+dist/
+tests/native-credentials/
+*.log
+host-error.txt
+helper-error.txt
+credential.dat
+options.json
+idle.txt
