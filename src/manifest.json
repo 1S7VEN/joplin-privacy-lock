@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "id": "local.joplin.minimize-lock",
   "app_min_version": "3.7",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "name": "隐私与锁定",
   "description": "可分别开关最小化、托盘锁定并设置延迟；支持自定义闲置时间、四位密码。Windows本地版。",
   "author": "Local custom plugin",

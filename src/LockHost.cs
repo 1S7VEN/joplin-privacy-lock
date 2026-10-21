@@ -154,6 +154,25 @@ sealed class LockContext : ApplicationContext {
         var message=new Label{Left=25,Top=top,Width=380,Height=42,ForeColor=Color.DarkRed};form.Controls.Add(message);
         var submit=new Button{Text=setup?"保存密码":"解锁",Left=25,Top=top+45,Width=380,Height=36};form.Controls.Add(submit);form.AcceptButton=submit;
         form.ClientSize=new Size(430,top+105);
+        if(!setup) {
+            // A compact, resizable unlock prompt; preserve the larger password setup form.
+            form.FormBorderStyle=FormBorderStyle.Sizable;
+            form.ClientSize=new Size(320,180);
+            form.MinimumSize=new Size(280+form.Width-form.ClientSize.Width,180+form.Height-form.ClientSize.Height);
+            foreach(Control control in form.Controls)
+                if(control is Label&&control!=title&&control!=message)control.Visible=false;
+            title.Text="输入密码解锁";
+            title.Font=new Font("Microsoft YaHei UI",11,FontStyle.Bold);
+            title.SetBounds(16,12,288,24);
+            title.Anchor=AnchorStyles.Top|AnchorStyles.Left|AnchorStyles.Right;
+            current.SetBounds(16,42,288,28);
+            current.Anchor=AnchorStyles.Top|AnchorStyles.Left|AnchorStyles.Right;
+            message.SetBounds(16,78,288,40);
+            message.Anchor=AnchorStyles.Top|AnchorStyles.Left|AnchorStyles.Right;
+            submit.SetBounds(16,134,288,30);
+            submit.Anchor=AnchorStyles.Bottom|AnchorStyles.Left|AnchorStyles.Right;
+        }
+
         submit.Click+=(sender,args)=>{
             if(busy)return;
             if(DateTime.UtcNow<retryAt){message.Text="尝试次数较多，请等待 15 秒再重试。";return;}
